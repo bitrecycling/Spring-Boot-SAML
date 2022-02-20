@@ -29,13 +29,10 @@ part.
 ### Single Logout (SLO) Profile
 Spring supports both IDP and SP initiated logouts. 
 
-### Metadata and Trust
-Trust between SP and IDP is established through preliminary exchange of SAML Metadata: SP must be "registered" at the IDP using it's metadata. That metadata contains certificates, identifiers and other data that is used throughout the SAML communication.
-
-### Encryption and Signatures
-The aforementioned metadata contains certificates that enable secure the communication through encryption and signatures of the exchanged SAML Documents. Even if no SSL / https is used (please don't) the SAML Login and Logout can be considered secure if encryption (noone else can read) and 
-signatures (noone else can manipulate) are used. 
-
+### Metadata Encryption and Signatures
+Trust between SP and IDP is established through preliminary exchange of SAML Metadata: SP must be "registered" at the IDP using it's metadata. That metadata contains certificates, identifiers and other data that is used throughout the SAML communication. The aforementioned metadata contains 
+certificates that enable secure the communication through encryption and signatures of the exchanged SAML Documents. Even if no SSL / https is used (please don't) the SAML Login and Logout can be considered secure if encryption (noone else can read) and 
+signatures (noone else can manipulate) are used.
 
 # Demo Application with Spring Boot (SP) and Keycloak (IDP)
 
@@ -46,9 +43,11 @@ SAML Tracer is a useful browser plugin (available for both firefox and chrome) t
 ## Encryption and Signatures
 Both encryption and document signing is used on the IDP and SP to secure SAML communication.
 
-
 ## Spring Boot Demo Application as SP
 The demo source contains a tiny api with some endpoints demo pages to show the login, logout and authorization and user details using the SAML assertion attributes. It runs on http://localhost:8080/samldemo
+
+### SAML Metadata
+The SAML Metadata endpoint is exposed under http://localhost:8080/spring-saml-demo/saml2/service-provider-metadata/spring_saml
 
 ### Login
 navigate to http://localhost:8080/samldemo and try some link. If you're not already authenticated, the browser get's redirected to the IDP login page. Login with the user created (see below). After that the browser gets redirected (actually submits a form POST) to the application that now knows 
