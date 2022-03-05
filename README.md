@@ -40,8 +40,11 @@ The spring boot demo application is based on servlet technology, not reactive. T
 
 SAML Tracer is a useful browser plugin (available for both firefox and chrome) that makes life easier inspecting the SAML communication, although the browser's development tools shall be fine as well.
 
-## Encryption and Signatures
-Both encryption and document signing is used on the IDP and SP to secure SAML communication.
+## Keys and Certificates Encryption and Signatures
+Both encryption and document signing is used on the IDP and SP to secure SAML communication. To create SP-related key / certificate you need keytool from jdk to be installed:
+```
+    keytool -genkeypair -alias spring_saml -keyalg RSA -keysize 4096 -sigalg SHA256withRSA -dname "cn=bitrecycling,dc=de" -keypass password  -validity 365 -storetype PKCS12 -storepass password -keystore springsaml.p12
+```
 
 ## Spring Boot Demo Application as SP
 The demo source contains a tiny api with some endpoints demo pages to show the login, logout and authorization and user details using the SAML assertion attributes. It runs on http://localhost:8080/samldemo
