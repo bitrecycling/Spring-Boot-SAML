@@ -6,17 +6,17 @@
     <link rel="stylesheet" href="helloapp.css">
 </head>
 <body>
-<h1>Welcome to Spring SAML Demo Application</h1>
+<h1 class="alert">Welcome to Spring SAML Demo Application</h1>
 
 The below paragraphs show messages that are requested from the server using ajax / xhr requests. The latter one only is available after successful login.
 
 Here you can <a href="/login">login</a> and <a href="/logout">logout</a>
 
-<h2>This is the public (unsecured) Hello Message from the Server</h2>
+<h2>This is the public (unsecured) Hello Message from the Server</h2>   
 Hello From Server: <div id="helloFromServer">init</div>
 
-<h2>This is the SAML secured Hello Message, only works after successful <a href="/login">login</a></h2>
+<h2 class="alert">This is the SAML secured Hello Message, only works after successful <a href="/login">login</a></h2>
 Secure Hello From Server: <div id="secureHelloFromServer">init</div>
-<script src="helloapp.js"></script>
+<script src="helloappsecure.js"></script>
 </body>
 </html>

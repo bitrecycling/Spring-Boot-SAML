@@ -50,7 +50,8 @@ Both encryption and document signing is used on the IDP and SP to secure SAML co
 The demo source contains a tiny api with some endpoints demo pages to show the login, logout and authorization and user details using the SAML assertion attributes. It runs on http://localhost:8080/samldemo
 
 ### SAML Metadata
-The SAML Metadata endpoint is exposed under http://localhost:8080/spring-saml-demo/saml2/service-provider-metadata/spring_saml
+The SP SAML Metadata is used to register with the IDP. The SAML Metadata endpoint is exposed under http://localhost:8080/saml2/service-provider-metadata/spring_saml. This is of course only if the defaults are used.
+Download the xml file and save it to a known location we need later.
 
 ### Login
 navigate to http://localhost:8080/samldemo and try some link. If you're not already authenticated, the browser get's redirected to the IDP login page. Login with the user created (see below). After that the browser gets redirected (actually submits a form POST) to the application that now knows 
@@ -66,10 +67,10 @@ docker run -p 8181:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin
 ### Create (import) Realm 
 1) Open http://localhost:8181 and navigate to Administration Console. Log in with admin/admin, see above.
 2) Navigate to Add Realm (top left corner dropdown)
-3) press "Select File" and locate the demo-realm.json file
-4) give a name, e.g. Demo and click "create"
+3) press "Select File" and locate the realm_spring_saml-with-client.json file in test/resources
+4) the name must be SPRING_SAML in order for the further examples to work
    
-You should now have a new "Realm" that contains a "Client". A client is loosely resembles an SP in keycloak terminology.
+You should now have a new "Realm" that contains a "Client". A client in keycloak terms equals an SP in SAML terminology.
 
 ### Add User
 You can now add users to the realm like this:

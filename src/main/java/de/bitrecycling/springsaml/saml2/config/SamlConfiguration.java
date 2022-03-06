@@ -43,21 +43,16 @@ public class SamlConfiguration {
     
     private final KeyReader keyReader;
 
-    @Value("${de.bitrecycling.springsaml.security.saml.sp.registration.id:spring_saml_demo}")
+    @Value("${de.bitrecycling.springsaml.security.saml.sp.registration.id:spring_saml}")
     private String spRegistrationId;
     @Getter
-    @Value("${de.bitrecycling.springsaml.security.saml.sp.entity.id:http://localhost:8080/spring-saml-demo}")
+    @Value("${de.bitrecycling.springsaml.security.saml.sp.entity.id:http://localhost:8080/spring_saml}")
     private String spEntityId;
     /**
      * this can either be a URL (http://...) or classpath resource (file in filesystem): classpath:
      */
     @Value("${de.bitrecycling.springsaml.security.saml.idp.metadata.url:http://localhost:8181/realms/SPRING_SAML/protocol/saml/descriptor}")
     private String idpMetadataEndpoint;
-
-//    @Value("${de.bitrecycling.springsaml.security.saml.rsaprivatekey.classpath:classpath:keys/spring_saml.privatekey}")
-//    RSAPrivateKey privateKey;
-    @Value("${de.bitrecycling.saml.sp-certificate:classpath:keys/spring_saml.crt}")
-    private Resource publicCertSP;
     
     /**
      * this uses the working from metadata but sets the wantAuthnRequestsSigned(true)
@@ -81,9 +76,6 @@ public class SamlConfiguration {
         return RelyingPartyRegistrations
                 .fromMetadataLocation(idpMetadataEndpoint)
                 .registrationId(spRegistrationId)
-//                .decryptionX509Credentials(
-//                        (c) -> c.add(Saml2X509Credential.decryption(this.privateKey,
-//                                readX509Cert(this.publicCertSP))))
                 .decryptionX509Credentials(
                         (c) -> c.add(Saml2X509Credential.decryption(keyReader.readPrivateKeyFromKeyStore(),
                                 keyReader.readCertificateFromKeyStore())))
@@ -104,10 +96,8 @@ public class SamlConfiguration {
     }
 
     /**
-     * SP / relying party (=our) SAML metadata can be reached here
-     * http://localhost:8080/spring-saml-demo/saml2/service-provider-metadata/spring_saml
-     *
-     * @return
+     * SP / relying party (=our) SAML metadata can be reached here (if not deviating from default config)
+     * http://localhost:8080/saml2/service-provider-metadata/spring_saml
      */
     @Bean
     public Saml2MetadataFilter metadataEndpointFilter() {
@@ -119,44 +109,19 @@ public class SamlConfiguration {
         return new DefaultRelyingPartyRegistrationResolver(myRelyingPartyRegistrationRepository());
     }
 
-    @Bean
-    Saml2LogoutRequestResolver myLogoutRequestResolver(RelyingPartyRegistrationResolver registrationResolver) {
-        OpenSaml4LogoutRequestResolver logoutRequestResolver =
-                new OpenSaml4LogoutRequestResolver(registrationResolver);
-        logoutRequestResolver.setParametersConsumer((parameters) -> {
-            String name =
-                    ((Saml2AuthenticatedPrincipal) parameters.getAuthentication().getPrincipal()).getName();
-            LogoutRequest logoutRequest = parameters.getLogoutRequest();
-            NameID nameId = logoutRequest.getNameID();
-            nameId.setValue(name);
-            nameId.setFormat(NameIDType.PERSISTENT); 
-        });
-        return logoutRequestResolver;
-    }
-
-
-    public X509Certificate readX509Cert(Resource certificate) {
-        try {
-            return X509Support.decodeCertificate(readFileAsString(certificate));
-        } catch (CertificateException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
-    private String readFileAsString(Resource res) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(res.getInputStream(),
-                StandardCharsets.UTF_8));
-
-        final String rawString = bufferedReader.lines().collect(Collectors.joining());
-        final String keyString = rawString
-                .replace("-----BEGIN PUBLIC KEY-----", "")
-                .replaceAll(System.lineSeparator(), "")
-                .replace("-----END PUBLIC KEY-----", "");
-        return rawString;
-        
-    }
-
+//    @Bean
+//    Saml2LogoutRequestResolver myLogoutRequestResolver(RelyingPartyRegistrationResolver registrationResolver) {
+//        OpenSaml4LogoutRequestResolver logoutRequestResolver =
+//                new OpenSaml4LogoutRequestResolver(registrationResolver);
+//        logoutRequestResolver.setParametersConsumer((parameters) -> {
+//            String name =
+//                    ((Saml2AuthenticatedPrincipal) parameters.getAuthentication().getPrincipal()).getName();
+//            LogoutRequest logoutRequest = parameters.getLogoutRequest();
+//            NameID nameId = logoutRequest.getNameID();
+//            nameId.setValue(name);
+//            nameId.setFormat(NameIDType.PERSISTENT); 
+//        });
+//        return logoutRequestResolver;
+//    }
+    
 }

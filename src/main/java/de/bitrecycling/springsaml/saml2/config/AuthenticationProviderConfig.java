@@ -9,19 +9,18 @@ import org.springframework.security.saml2.provider.service.authentication.Saml2A
 
 @Configuration
 public class AuthenticationProviderConfig{
-	//@Bean
-	public AuthenticationProvider myAuthenticationProvider(){
-//		OpenSaml4AuthenticationProvider my = new OpenSaml4AuthenticationProvider();
-//		my.setResponseAuthenticationConverter(responseToken -> {
-//			responseToken.getToken();
-//			Saml2Authentication saml2Authentication =
-//					OpenSaml4AuthenticationProvider.createDefaultResponseAuthenticationConverter().convert(responseToken);
-//			// here goes custom code that is relevant to your project's UserDetails / Authentication
-//			//this might be useful
-//			Saml2AuthenticatedPrincipal principal = (Saml2AuthenticatedPrincipal) saml2Authentication.getPrincipal();
-//			return principal;
-//		});
-//		
-		return null;
+	@Bean
+	public AuthenticationProvider springSamlAuthenticationProvider(){
+		OpenSaml4AuthenticationProvider springSamlAuthenticationProvider = new OpenSaml4AuthenticationProvider();
+		springSamlAuthenticationProvider.setResponseAuthenticationConverter(responseToken -> {
+			responseToken.getToken();
+			Saml2Authentication saml2Authentication =
+					OpenSaml4AuthenticationProvider.createDefaultResponseAuthenticationConverter().convert(responseToken);
+			// here goes custom code that is relevant to your project's UserDetails / Authentication
+			//this might be useful
+			Saml2AuthenticatedPrincipal principal = (Saml2AuthenticatedPrincipal) saml2Authentication.getPrincipal();
+			return saml2Authentication;
+		});
+		return springSamlAuthenticationProvider;
 	}
 }

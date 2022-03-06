@@ -1,0 +1,13 @@
+body {
+    background-color: white;
+    font-family: sans-serif;
+    margin-left: 20px;
+}
+
+h1 {
+    color: #12223e;
+}
+
+.alert {
+    background-color: red;
+}
