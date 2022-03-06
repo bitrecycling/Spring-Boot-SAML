@@ -52,6 +52,8 @@ public class SamlConfiguration {
      * this can either be a URL (http://...) or classpath resource (file in filesystem): classpath:
      */
     @Value("${de.bitrecycling.springsaml.security.saml.idp.metadata.url:http://localhost:8181/realms/SPRING_SAML/protocol/saml/descriptor}")
+//    @Value("${de.bitrecycling.springsaml.security.saml.idp.metadata" +
+//            ".url:classpath:metadata/ipd_metadata.xml}")
     private String idpMetadataEndpoint;
     
     /**
@@ -109,19 +111,26 @@ public class SamlConfiguration {
         return new DefaultRelyingPartyRegistrationResolver(myRelyingPartyRegistrationRepository());
     }
 
-//    @Bean
-//    Saml2LogoutRequestResolver myLogoutRequestResolver(RelyingPartyRegistrationResolver registrationResolver) {
-//        OpenSaml4LogoutRequestResolver logoutRequestResolver =
-//                new OpenSaml4LogoutRequestResolver(registrationResolver);
-//        logoutRequestResolver.setParametersConsumer((parameters) -> {
-//            String name =
-//                    ((Saml2AuthenticatedPrincipal) parameters.getAuthentication().getPrincipal()).getName();
-//            LogoutRequest logoutRequest = parameters.getLogoutRequest();
-//            NameID nameId = logoutRequest.getNameID();
-//            nameId.setValue(name);
-//            nameId.setFormat(NameIDType.PERSISTENT); 
-//        });
-//        return logoutRequestResolver;
-//    }
+    /**
+     * necessary as log as Spring security only handles nameId logout requests (instead of e.g. encryptedId)
+     * see https://github.com/spring-projects/spring-security/issues/10663
+     * and https://github.com/spring-projects/spring-security/pull/10689
+     * @param registrationResolver
+     * @return
+     */
+    @Bean
+    Saml2LogoutRequestResolver nameIdLogoutRequestResolver(RelyingPartyRegistrationResolver registrationResolver) {
+        OpenSaml4LogoutRequestResolver logoutRequestResolver =
+                new OpenSaml4LogoutRequestResolver(registrationResolver);
+        logoutRequestResolver.setParametersConsumer((parameters) -> {
+            String name =
+                    ((Saml2AuthenticatedPrincipal) parameters.getAuthentication().getPrincipal()).getName();
+            LogoutRequest logoutRequest = parameters.getLogoutRequest();
+            NameID nameId = logoutRequest.getNameID();
+            nameId.setValue(name);
+            nameId.setFormat(NameIDType.PERSISTENT); 
+        });
+        return logoutRequestResolver;
+    }
     
 }
