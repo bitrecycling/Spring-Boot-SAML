@@ -1,5 +1,6 @@
 package de.bitrecycling.springsaml.controller;
 
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +12,6 @@ public class AuthenticationController {
 	
 	@GetMapping("/status/isLoggedIn")
 	public Boolean checkStatus(){
-		return SecurityContextHolder.getContext().getAuthentication().isAuthenticated();
+		return !(SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken);
 	}
 }

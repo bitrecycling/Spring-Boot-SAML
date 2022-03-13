@@ -61,6 +61,10 @@ public class SamlConfiguration {
                 ).build();
     }
 
+    /**
+     * this determines, which data will be rendered into the SPs metadata
+     * @return
+     */
     private RelyingPartyRegistration fromIPDMetaData() {
         return RelyingPartyRegistrations
                 .fromMetadataLocation(idpMetadataEndpoint)

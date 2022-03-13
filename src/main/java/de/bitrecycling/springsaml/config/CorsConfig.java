@@ -1,4 +1,4 @@
-package de.bitrecycling.springsaml.saml2.config;
+package de.bitrecycling.springsaml.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -6,7 +6,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class SpringSamlCorsConfiguration {
+public class CorsConfig {
 
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
@@ -15,7 +15,8 @@ public class SpringSamlCorsConfiguration {
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**")
 						.allowedOrigins("http://localhost:8080", "http://localhost:8989")
-						.allowedMethods("*");
+						.allowedMethods("*")
+						.allowCredentials(true);
 			}
 		};
 	}
