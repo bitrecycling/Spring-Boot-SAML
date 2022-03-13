@@ -34,9 +34,7 @@ public class SamlConfiguration {
     @Value("${de.bitrecycling.springsaml.security.saml.sp.registration.id:spring_saml}")
     private String spRegistrationId;
     @Getter
-//    @Value("${de.bitrecycling.springsaml.security.saml.sp.entity.id:http://localhost:8080/spring_saml}")
-//    @Value("${de.bitrecycling.springsaml.security.saml.sp.entity.id:{baseUrl}/spring_saml}")
-//    private String spEntityId;
+
     /**
      * this can either be a URL (http://...) or classpath resource (file in filesystem): classpath:
      */
