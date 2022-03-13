@@ -56,35 +56,24 @@ The spring boot demo application is based on servlet technology, not reactive. T
 
 SAML Tracer is a useful browser plugin (available for both firefox and chrome) that makes life easier inspecting the SAML communication, although the browser's development tools shall be fine as well.
 
-## Keys and Certificates Encryption and Signatures
-Both encryption and document signing is used on the IDP and SP to secure SAML communication. To create SP-related key / certificate you need keytool from jdk to be installed:
-```
-    keytool -genkeypair -alias spring_saml -keyalg RSA -keysize 4096 -sigalg SHA256withRSA -dname "cn=bitrecycling,dc=de" -keypass password  -validity 365 -storetype PKCS12 -storepass password -keystore springsaml.p12
-```
 
-## Spring Boot Demo Application as SP
-The demo source contains a tiny api with some endpoints demo pages to show the login, logout and authorization and user details using the SAML assertion attributes. It runs on http://localhost:8080/samldemo
-
-### SAML Metadata
-The SP SAML Metadata is used to register with the IDP. The SAML Metadata endpoint is exposed under http://localhost:8080/saml2/service-provider-metadata/spring_saml. This is of course only if the defaults are used.
-Download the xml file and save it to a known location we need later.
-
-### Login
-navigate to http://localhost:8080/samldemo and try some link. If you're not already authenticated, the browser get's redirected to the IDP login page. Login with the user created (see below). After that the browser gets redirected (actually submits a form POST) to the application that now knows 
-you as the user you logged in with.
-
-## Keycloak as IDP (dockerized)
+## Setup Keycloak as IDP (dockerized)
 from https://www.keycloak.org/getting-started/getting-started-docker
 
-Start keycloak in docker on local port 8181 with admin / admin. This is **NOT A SAFE PRODUCTION CONFIG**
+Run once to create and run a keycloak docker container on local port 8181 with admin / admin. This is **NOT A SAFE PRODUCTION CONFIG**
 ```shell
-docker run -p 8181:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:17.0.0 start-dev
+docker run --name keycloak -p 8181:8080 -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin jboss/keycloak
 ```
-### Create (import) Realm 
-1) Open http://localhost:8181 and navigate to Administration Console. Log in with admin/admin, see above.
+to stop or (re)start the container created above
+```shell
+docker container stop keylcoak
+docker container start keylcoak
+```
+
+### Create Realm 
+1) Open http://localhost:8181 and navigate to Administration Console. Log in with admin/admin
 2) Navigate to Add Realm (top left corner dropdown)
-3) press "Select File" and locate the realm_spring_saml-with-client.json file in test/resources
-4) the name must be SPRING_SAML in order for the further examples to work
+3) enter "SPRING_SAML" as name, leave other options untouched, press create
    
 You should now have a new "Realm" that contains a "Client". A client in keycloak terms equals an SP in SAML terminology.
 
@@ -95,6 +84,48 @@ You can now add users to the realm like this:
 3) on the "Credentials" tab: enter a password (and confirmation), unselect "Temporary" and click "Set Password"
 
 You should now have created a user that you can use in the demo application to log in to the application.
+
+
+
+## Setup Spring Boot Demo Application as SP
+The demo source contains a tiny api with some endpoints demo pages to show the login, logout and authorization and user details using the SAML assertion attributes.
+
+### import IDP metadata to SP resources
+1) navigate to "Realm Settings"
+2) right-click "SAML 2.0 Identity Provider Metadata" next to "Endpoints" and save to 
+   ```src/main/resources/metadata/idp_metadata.xml``` 
+
+## Keys and Certificates Encryption and Signatures
+Both encryption and document signing is used on the IDP and SP to secure SAML communication. To do this, a SP key / certificate (as PKCS12 archive) need to be present in the resources/keys. There is already an existing pair, but I recommend to create your own.
+To do so, you need keytool from jdk to be installed:
+```
+    keytool -genkeypair -alias spring_saml -keyalg RSA -keysize 4096 -sigalg SHA256withRSA -dname "cn=bitrecycling,dc=de" -keypass password  -validity 365 -storetype PKCS12 -storepass password -keystore springsaml.p12
+```
+copy to ```/src/main/resouces/keys```
+
+### start application 
+```shell
+mvn clean spring-boot:run
+```
+If everything went fine, the SP should run on http://localhost:8080 an knows the keycloak as SAML IDP
+
+### download SAML Metadata and import to keycloak
+The SP SAML Metadata is used to register with the IDP. The SAML Metadata endpoint is exposed under http://localhost:8080/saml2/service-provider-metadata/spring_saml. This is of course only if the defaults are used.
+1) Download the xml file and save it to a known location (e.g. /tmp/saml-spring_saml-metadata.xml).
+2) in keycloak click "Clients" in lefthand nav.
+3) click "create" button far right table header
+4) click "Select File" next to "Import"
+5) locate the saved file from 1 and proceed with "save"
+
+
+## Done with setup!
+You should now have a working keycloak and spring boot app set up to work together as IDP and SP 
+
+## Try out and Login
+navigate to http://localhost:8080/ and try some link. If you're not already authenticated, the browser get's redirected to the IDP login page. Login with the user created (see below). After that the browser gets redirected (actually submits a form POST) to the application that now knows
+you as the user you logged in with.
+
+
 
 ## Real World Challenges
 In production scenarios the world gets a little more difficult, as usual. Since the Spring SAML support was "just recently" adopted by the spring security core team there's some more or less critical features missing and some bugs. Until covered by official release some of them need still to be 

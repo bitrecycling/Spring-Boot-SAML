@@ -3,7 +3,6 @@ package de.bitrecycling.springsaml;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -14,8 +13,9 @@ public class TestWebserver  {
 	static final int port = 8989;
 	static final String newLine = "\r\n";
 	private static final String FETCH_OPTIONS = "{ credentials: 'include' }";
-	private static String baseURL = "https://api.test.de";
-	private static String checkIsLoggedInUrl = "/authentication/isLoggedIn";
+	private static String apiBaseURL = "http://localhost:8080";
+	private static String checkIsLoggedInUrl = "/authentication/status/isLoggedIn";
+	private static String logoutUrl = "/logout/saml2/slo";
 	private static String putUserSettingsUrl = "/user/settings";
 
 
@@ -149,7 +149,7 @@ public class TestWebserver  {
 				"\n" +
 				
 				"<a href=\"#\" onclick=\"putUserSettings()\"> PUT user settings</a>\n" +
-				"<form action=\"" + baseURL + "/logout\" method=\"POST\">" +
+				"<form action=\"" + apiBaseURL + logoutUrl+ "\" method=\"POST\">" +
 				"<button type=\"submit\">Logout</button>\n" +
 				"</form>\n" +
 
@@ -162,7 +162,7 @@ public class TestWebserver  {
 
 		return "async function checkLoginState() {\n" +
 				"    let response = await fetch(\" " +
-				baseURL + checkIsLoggedInUrl
+				apiBaseURL + checkIsLoggedInUrl
 				+ "\", " +
 				FETCH_OPTIONS +
 				" );" +
@@ -176,7 +176,7 @@ public class TestWebserver  {
 				"    document.getElementById('cook').textContent = document.cookie;\n" +
 				"}\n" +
 				"\n\n" +
-				"async function putUserSettings(url = '" + baseURL + putUserSettingsUrl + "'" +
+				"async function putUserSettings(url = '" + apiBaseURL + putUserSettingsUrl + "'" +
 				", data = {\"settings\":\"{}\"}) {\n" +
 				"  const response = await fetch(url, {\n" +
 				"    method: 'PUT',\n" +

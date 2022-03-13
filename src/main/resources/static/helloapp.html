@@ -10,13 +10,13 @@
 
 The below paragraphs show messages that are requested from the server using ajax / xhr requests. The latter one only is available after successful login.
 
-Here you can <a href="/login">login</a> and <a href="/logout">logout</a>
-
 <h2>This is the public (unsecured) Hello Message from the Server</h2>
-Hello From Server: <div id="helloFromServer">init</div>
+Server says: <div id="helloFromServer"><b>init</b></div>
 
 <h2>This is the SAML secured Hello Message, only works after successful <a href="/login">login</a></h2>
-Secure Hello From Server: <div id="secureHelloFromServer">init</div>
+Server says: <div id="secureHelloFromServer"><b>init</b></div>
+
+<form method="POST" action="/logout/saml2/slo"><button type="submit"><b>logout</b></button></form>
 <script src="helloapp.js"></script>
 </body>
 </html>

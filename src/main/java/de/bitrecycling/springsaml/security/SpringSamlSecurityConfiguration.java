@@ -37,11 +37,13 @@ public class SpringSamlSecurityConfiguration extends WebSecurityConfigurerAdapte
 
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
+		//part 0,1 disable csrf for now!
+		http.csrf().disable();
+		
 		//part 1: public anonymous paths
 		http.authorizeHttpRequests().antMatchers("/").permitAll();
 		//part 2: secured paths
 		http.authorizeHttpRequests().antMatchers("/secure*","/secure/*").authenticated();
-		
 
 		//part 3: saml details config
 		http.saml2Login() //make it saml login
@@ -50,12 +52,14 @@ public class SpringSamlSecurityConfiguration extends WebSecurityConfigurerAdapte
 		.defaultSuccessUrl("/"); // custom auth
 		
 		// part 4: logout details
-		http.saml2Logout() // activate logout with following properties
-				.logoutRequest().logoutUrl(LOGOUT_REQUEST_URL) //endpoint to receive logout request from idp
-				.logoutRequestResolver(nameIdLogoutRequestResolver); //use this to generate logout request towards idp
+		http.saml2Logout().relyingPartyRegistrationRepository(myRelyingPartyRegistrationRepository)
+				.logoutUrl(LOGOUT_REQUEST_URL) //endpoint to receive logout request from idp
+				.logoutRequest()
+				.logoutRequestResolver(nameIdLogoutRequestResolver); //use this to generate logout 
+		// request towards idp
 		
-		http.saml2Logout()
-				.logoutResponse().logoutUrl(LOGOUT_RESPONSE_URL); // endpoint to receive logout response from idp
+//		http.saml2Logout()
+//				.logoutResponse().logoutUrl(LOGOUT_RESPONSE_URL); // endpoint to receive logout response from idp
 		
 	}
 	

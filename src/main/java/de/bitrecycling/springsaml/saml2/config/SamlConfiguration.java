@@ -30,18 +30,18 @@ import org.springframework.security.saml2.provider.service.web.authentication.lo
 public class SamlConfiguration {
     
     private final KeyReader keyReader;
-
+    private static final String LOGOUT_REQUEST_URL = "{baseUrl}/logout/saml2/slo";
     @Value("${de.bitrecycling.springsaml.security.saml.sp.registration.id:spring_saml}")
     private String spRegistrationId;
     @Getter
-    @Value("${de.bitrecycling.springsaml.security.saml.sp.entity.id:http://localhost:8080/spring_saml}")
-    private String spEntityId;
+//    @Value("${de.bitrecycling.springsaml.security.saml.sp.entity.id:http://localhost:8080/spring_saml}")
+//    @Value("${de.bitrecycling.springsaml.security.saml.sp.entity.id:{baseUrl}/spring_saml}")
+//    private String spEntityId;
     /**
      * this can either be a URL (http://...) or classpath resource (file in filesystem): classpath:
      */
-    @Value("${de.bitrecycling.springsaml.security.saml.idp.metadata.url:http://localhost:8181/realms/SPRING_SAML/protocol/saml/descriptor}")
-//    @Value("${de.bitrecycling.springsaml.security.saml.idp.metadata" +
-//            ".url:classpath:metadata/ipd_metadata.xml}")
+//    @Value("${de.bitrecycling.springsaml.security.saml.idp.metadata.url:http://localhost:8181/realms/SPRING_SAML/protocol/saml/descriptor}")
+    @Value("${de.bitrecycling.springsaml.security.saml.idp.metadata.url:classpath:metadata/idp_metadata.xml}")
     private String idpMetadataEndpoint;
     
     /**
@@ -59,6 +59,7 @@ public class SamlConfiguration {
         return
                 RelyingPartyRegistration.withRelyingPartyRegistration(fromIPDMetaData()).assertingPartyDetails(
                         details -> details.wantAuthnRequestsSigned(true) //make sure this is true
+                        
                 ).build();
     }
 
@@ -72,6 +73,8 @@ public class SamlConfiguration {
                 .signingX509Credentials(
                         (c) -> c.add(Saml2X509Credential.signing(keyReader.readPrivateKeyFromKeyStore(),
                                 keyReader.readCertificateFromKeyStore())))
+                .singleLogoutServiceResponseLocation(LOGOUT_REQUEST_URL)
+                .singleLogoutServiceLocation(LOGOUT_REQUEST_URL)
                 .build();
     }
 
