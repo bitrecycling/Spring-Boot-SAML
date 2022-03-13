@@ -16,7 +16,7 @@ in essence we care about 3 Entities: User, Service Provider, Identity Provider:
 The Security Assertion Markup Language defines a set of XML documents that are used throughout the login and logout. 
 
 #### Assertion
-All data that is transferred upon successful login by the IDP (hence asserting party) to the SP (hence relying party). This data is usually related to the Subject (a User) might include e.g. authorities, roles, user identifiers, user names... 
+All data that is transferred upon successful login by the IDP (hence asserting party) to the SP (hence relying party). This data is usually related to the Subject (a User) and usually includes identifiers, names, authorities...
 
 Usually there is 1 Assertion containing n attributes, technically however more than one assertion is possible. Sometimes the attributes are referred to as "assertions" although this is wrong.
 
@@ -29,10 +29,26 @@ part.
 ### Single Logout (SLO) Profile
 Spring supports both IDP and SP initiated logouts. 
 
-### Metadata Encryption and Signatures
+### Metadata, Encryption and Signatures
 Trust between SP and IDP is established through preliminary exchange of SAML Metadata: SP must be "registered" at the IDP using it's metadata. That metadata contains certificates, identifiers and other data that is used throughout the SAML communication. The aforementioned metadata contains 
 certificates that enable secure the communication through encryption and signatures of the exchanged SAML Documents. Even if no SSL / https is used (please don't) the SAML Login and Logout can be considered secure if encryption (noone else can read) and 
 signatures (noone else can manipulate) are used.
+
+### Authentication Flow
+If a user enters the SP / application (or hits the api) anonymously or logged out, a "redirect" to the IDP takes the user to the login form provided by the IDP. The redirect contains some information (the SAML AuthenticationRequest) about the SP that initiated the authentication on behalf of the 
+user. Hence the IDP knows where to send the user after successful authentication and also which certificate to use to encrypt the assertion. If the user enters valid data, the browser is redirected back to the Application with a SAML Response that gets evaluated by the SP / application. If the SP 
+validates the SAML Reponse and evaluates the Assertion, the user is "logged in" an can act based upon the Authorization given by SP, e.g. by evaluating authorities from the Assertion or some other means. 
+
+### Session, Cookies, Tokens
+After successful authentication, the only thing that is left is an authenticated session. Usually in Spring the session is *cookie based*, hence for it to work the cookie must be sent by the browser. 
+
+Why - you may ask - am I mentioning this here? Because "modern" Browsers only send the cookie under certain circumstances for security reasons. 
+
+There is a slightly less secure way that is transferring the session identifier (aka Token) using HTTP-Headers. This also means the client application has to deal with that token. Also if that token get's stolen, the attacker can easily take over the session. Both of this is much harder to to if 
+a cookie is used, since that cookie can be configured to be more secure. Buzzwords: SameSite Secure HttpOnly. See example.
+
+
+
 
 # Demo Application with Spring Boot (SP) and Keycloak (IDP)
 
